@@ -5,15 +5,93 @@ import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+
 import java.util.*;
 
-// 10.10.10.50
-// komunikacja, grafika, lapanie ruchu kursora
-// TODO: Three buttons: connect, start, end (like woods and rocks in Map_1)
+import javafx.concurrent.*;
 
-public class JavaFXApp extends Application {
+import javafx.beans.value.*;
+
+
+class P_move {
+    int x, y;
+
+    public P_move() {
+        x = 10;
+        y = 10;
+    }
+}
+
+class G_task extends Task<P_move> {
+    P_move p_move;
+
+    public G_task() {
+        this.p_move = new P_move();
+    }
+
+    @Override
+    protected P_move call() throws Exception {
+        int i = 0;
+
+        while (true) {
+            System.out.println("Task's call method");
+
+            p_move.x = 10 + i;
+            p_move.y = 10 + i;
+
+            updateValue(null);
+            updateValue(p_move);
+
+            System.out.println("i=" + i);
+
+            i++;
+
+            System.out.println("x = " + p_move.x + "y = " + p_move.y);
+
+
+            if (i == 10) {
+                updateValue(null);
+                break;
+            }
+
+
+            try {
+                Thread.sleep(1000);
+                System.out.println("sleep method");
+            } catch (InterruptedException ex) {
+                System.out.println("catch method");
+                break;
+            }
+        }
+
+
+        return p_move;
+    }
+}
+
+class Game_service extends Service<P_move> {
+
+    Task t;
+
+    public Game_service() {
+
+    }
+
+    protected Task createTask() {
+        t = new G_task();
+
+        return t;
+
+    }
+
+}
+
+
+public class JavaFXApp extends Application implements ChangeListener<P_move> {
 
     Stage stage;
+
+    Game_service g_s;
 
     public static void main(String[] args) {
         launch(args);
@@ -27,9 +105,7 @@ public class JavaFXApp extends Application {
 
         Menu menu1 = new Menu("File");
 
-
         MenuItem menuItem1 = new MenuItem("Item 1");
-
 
         MenuItem menuItem2 = new MenuItem("Exit");
 
@@ -58,15 +134,33 @@ public class JavaFXApp extends Application {
             e.consume();
             exit_dialog();
         });
-        // TODO: Draw connect button
-        // TODO: Draw start button
-        // TODO: Draw end button
+
+        g_s = new Game_service();
+
+        g_s.valueProperty().addListener(this::changed);
+
+        g_s.start();
 
         primaryStage.show();
+
+    }
+
+    public void changed(ObservableValue<? extends P_move> observable,
+                        P_move oldValue,
+                        P_move newValue) {
+        if (newValue != null) System.out.println("changed method called, x = " + newValue.x + "y = " + newValue.y);
+
+
+    }
+
+
+    public void item_1() {
+        System.out.println("item 1");
     }
 
     public void exit_dialog() {
         System.out.println("exit dialog");
+
 
         Alert alert = new Alert(AlertType.CONFIRMATION,
                 "Do you really want to exit the program?.",
@@ -82,25 +176,6 @@ public class JavaFXApp extends Application {
             Platform.exit();
         } else {
         }
-    }
 
-    public void connect_button(){
-        // TODO: Implement connect_button
-    }
-    public void start_button(){
-        // TODO: Implement start button
-    }
-    public void end_button(){
-        // TODO: Implement end button
-    }
-
-    public void key() {
-        // TODO: Implement key handler
-        // Here use server methods??
-        // Jak draw_1 w C
-    }
-
-    public void draw() {
-        // TODO: Implement drawing loop
     }
 }

@@ -23,10 +23,10 @@ public class Server {
 
     public static void run(P_move p) throws IOException, ClassNotFoundException {
         // TODO: Implement receiving and sending game objects
-        byte buf[] = new byte[2];
+        byte buf[] = new byte[43];
         // byte send[] = {(byte)x, (byte)y}; // Game()
         byte send[] = serialize(p);
-        DatagramPacket datagramPacket = new DatagramPacket(buf, 2); // do odbierania inny buf i length
+        DatagramPacket datagramPacket = new DatagramPacket(buf, 43); // do odbierania inny buf i length
         datagramSocket.receive(datagramPacket);
         System.out.println(Arrays.toString(datagramPacket.getData()));
         DatagramPacket sendpacket = new DatagramPacket(send, send.length,

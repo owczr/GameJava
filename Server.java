@@ -21,23 +21,17 @@ public class Server {
         datagramSocket = new DatagramSocket(port);
     }
 
-    public static void run(int x, int y) throws IOException, ClassNotFoundException {
+    public static void run(P_move p) throws IOException, ClassNotFoundException {
         // TODO: Implement receiving and sending game objects
-        // Sketch:
-        //System.out.println("Server send x " + x + " y " + y);
         byte buf[] = new byte[2];
-        byte send[] = {13, 18}; // Game()
-        // int coords[] = {x, y};
-        // byte send[] = serialize(coords);
-        DatagramPacket datagramPacket = new DatagramPacket(buf, 2);
-//        DatagramPacket sendpacket = new DatagramPacket(send, 2,
-//                InetAddress.getByName("10.10.10.100"), 5252);
-//        datagramSocket.send(sendpacket);
-//        System.out.println("Server send");
+        // byte send[] = {(byte)x, (byte)y}; // Game()
+        byte send[] = serialize(p);
+        DatagramPacket datagramPacket = new DatagramPacket(buf, 2); // do odbierania inny buf i length
         datagramSocket.receive(datagramPacket);
         System.out.println(Arrays.toString(datagramPacket.getData()));
-        DatagramPacket sendpacket = new DatagramPacket(send, 2,
+        DatagramPacket sendpacket = new DatagramPacket(send, send.length,
                 datagramPacket.getAddress(), datagramPacket.getPort());
+
         System.out.println("Server send");
         datagramSocket.send(sendpacket);
     }
@@ -55,18 +49,17 @@ public class Server {
     }
 
     // used to pack game object
-    public static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+    public static byte[] serialize(P_move obj) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream(6400);
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);
         return out.toByteArray();
     }
 
     // used to unpack received object
-    public static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        // FIXME: Zawiesza sie przy wywolaniu
+    public static P_move deserialize(byte[] data) throws IOException, ClassNotFoundException {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         ObjectInputStream is = new ObjectInputStream(in);
-        return is.readObject();
+        return (P_move)is.readObject();
     }
 }

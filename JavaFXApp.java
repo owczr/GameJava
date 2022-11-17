@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.SocketException;
 import java.util.*;
 
@@ -15,13 +16,17 @@ import javafx.concurrent.*;
 import javafx.beans.value.*;
 
 
-class P_move {
+class P_move implements Serializable{
     int x, y;
 
     public P_move() {
         x = 10;
         y = 10;
     }
+}
+class gameState implements Serializable {
+    P_move p1;
+    P_move p2;
 }
 
 class G_task extends Task<P_move> {
@@ -54,7 +59,7 @@ class G_task extends Task<P_move> {
             System.out.println("x = " + p_move.x + "y = " + p_move.y);
 
             System.out.println("run method called");
-            server.run(p_move.x, p_move.y);
+            server.run(p_move);
 
             if (i == 10) {
                 updateValue(null);

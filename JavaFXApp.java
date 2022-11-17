@@ -6,6 +6,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
+import java.io.IOException;
+import java.net.SocketException;
 import java.util.*;
 
 import javafx.concurrent.*;
@@ -25,8 +27,11 @@ class P_move {
 class G_task extends Task<P_move> {
     P_move p_move;
 
-    public G_task() {
+    Server server;
+
+    public G_task(Server s) {
         this.p_move = new P_move();
+        server = s;
     }
 
     @Override
@@ -48,6 +53,8 @@ class G_task extends Task<P_move> {
 
             System.out.println("x = " + p_move.x + "y = " + p_move.y);
 
+            System.out.println("run method called");
+            server.run(p_move.x, p_move.y);
 
             if (i == 10) {
                 updateValue(null);
@@ -55,13 +62,13 @@ class G_task extends Task<P_move> {
             }
 
 
-            try {
-                Thread.sleep(1000);
-                System.out.println("sleep method");
-            } catch (InterruptedException ex) {
-                System.out.println("catch method");
-                break;
-            }
+//            try {
+//                Thread.sleep(1000);
+//                System.out.println("sleep method");
+//            } catch (InterruptedException ex) {
+//                System.out.println("catch method");
+//                break;
+//            }
         }
 
 
@@ -73,12 +80,13 @@ class Game_service extends Service<P_move> {
 
     Task t;
 
-    public Game_service() {
-
+    Server server;
+    public Game_service(Server s) {
+        server = s;
     }
 
     protected Task createTask() {
-        t = new G_task();
+        t = new G_task(server);
 
         return t;
 
@@ -91,7 +99,12 @@ public class JavaFXApp extends Application implements ChangeListener<P_move> {
 
     Stage stage;
 
-    Game_service g_s;
+    Server server = new Server(5252);
+    Game_service g_s = new Game_service(server);
+
+    public JavaFXApp() throws SocketException {
+    }
+
 
     public static void main(String[] args) {
         launch(args);
@@ -135,7 +148,7 @@ public class JavaFXApp extends Application implements ChangeListener<P_move> {
             exit_dialog();
         });
 
-        g_s = new Game_service();
+        g_s = new Game_service(server);
 
         g_s.valueProperty().addListener(this::changed);
 
@@ -148,7 +161,16 @@ public class JavaFXApp extends Application implements ChangeListener<P_move> {
     public void changed(ObservableValue<? extends P_move> observable,
                         P_move oldValue,
                         P_move newValue) {
-        if (newValue != null) System.out.println("changed method called, x = " + newValue.x + "y = " + newValue.y);
+        if (newValue != null) {
+            System.out.println("changed method called, x = " + newValue.x + "y = " + newValue.y);
+//            try {
+//                Server.run(newValue.x, newValue.y);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            } catch (ClassNotFoundException e) {
+//                throw new RuntimeException(e);
+//            }
+        }
 
 
     }

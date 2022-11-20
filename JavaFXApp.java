@@ -71,7 +71,7 @@ class G_task extends Task<P_move>
    System.out.println("x = " +  p_move.x + "; y = " +  p_move.y);
 
    System.out.println("run method called");
-   Client.run(p_move.x, p_move.y);
+   Client.run(p_move);
 
 
    if(i == 10)

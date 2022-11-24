@@ -19,7 +19,8 @@ public class Client {
     //byte[] byteBuffer = {(byte)x, (byte)y};
     //byte[] byteBuffer1 = new byte[2];
     byte send[] = serialize(p);
-    DatagramPacket packet = new DatagramPacket(send, send.length, address, datagramSocket.getPort());
+//    System.out.println(datagramSocket.getLocalPort());
+    DatagramPacket packet = new DatagramPacket(send, send.length, address, datagramSocket.getLocalPort() );
     DatagramPacket packetReceive = new DatagramPacket(buf, 43);
 
     datagramSocket.send(packet);
@@ -28,6 +29,9 @@ public class Client {
     datagramSocket.receive(packetReceive);
     System.out.println("Client received");
     //System.out.println("The packet data received are: " + Arrays.toString(packetReceive.getData()));
+//    System.out.println("The packet data received are: " + Arrays.toString(new Object[]{deserialize(packetReceive.getData())});
+    P_move rec_data = deserialize(packetReceive.getData());
+    System.out.println("X: "+ rec_data.x+" Y= "+rec_data.y);
   }
 
   // used to pack game object
@@ -39,9 +43,9 @@ public class Client {
   }
 
   // used to unpack received object
-  public static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
+  public static P_move deserialize(byte[] data) throws IOException, ClassNotFoundException {
     ByteArrayInputStream in = new ByteArrayInputStream(data);
     ObjectInputStream is = new ObjectInputStream(in);
-    return is.readObject();
+    return (P_move)is.readObject();
   }
 }

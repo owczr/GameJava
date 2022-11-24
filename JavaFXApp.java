@@ -9,14 +9,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.SocketException;
 import java.util.*;
 
 import javafx.concurrent.*;
 
-import javafx.beans.*;
 import javafx.beans.value.*;
 
 
@@ -31,21 +29,28 @@ class P_move implements Serializable
  }
 }
 
-class GameState implements Serializable
+class gameState implements Serializable
 {
- P_move p1;
- P_move p2;
+ P_move p_c; //client
+ P_move p_s; //server
+
+ public gameState()
+ {
+  this.p_c = new P_move();
+  this.p_s = new P_move();
+ }
 }
 
 class G_task extends Task<P_move>
 {
  P_move p_move;
-
+ gameState g_State;
  Client client;
 
  public G_task(Client c)
  {
   this.p_move = new P_move();
+  this.g_State = new gameState();
   client = c;
  }
 
@@ -61,6 +66,7 @@ class G_task extends Task<P_move>
    p_move.x = 10 + i;
    p_move.y = 10 + i;
 
+
    updateValue(null);
    updateValue(p_move);
 
@@ -69,16 +75,16 @@ class G_task extends Task<P_move>
    i++;
 
    System.out.println("x = " +  p_move.x + "; y = " +  p_move.y);
-
+   g_State.p_c = p_move;
    System.out.println("run method called");
-   Client.run(p_move);
+   Client.run(g_State);
 
 
-   if(i == 10)
-   {
-    updateValue(null);
-    break;
-   }
+//   if(i == 10)
+//   {
+//    updateValue(null);
+//    break;
+//   }
 
 
 //   try { Thread.sleep(1000);  System.out.println("sleep method");    }
@@ -90,7 +96,7 @@ class G_task extends Task<P_move>
   }
 
 
-  return p_move;
+//  return p_move;
  }
 }
 
@@ -132,7 +138,7 @@ public class JavaFXApp extends Application implements ChangeListener<P_move>
 
 
  Client client = new Client(5252);
- Game_service g_s = new Game_service(client);
+ Game_service g_Service = new Game_service(client);
 
  //Game_service g_s;
 
@@ -180,23 +186,23 @@ public class JavaFXApp extends Application implements ChangeListener<P_move>
   //System.out.println("GS1:"+g_s.getState().toString());
 
   //canvas potrzeby do obslugi przyciskow z klawiatury (2/2)
-  canvas = new Canvas(FRAME_WIDTH, FRAME_HEIGHT);
-  canvas.setOnKeyPressed(this::key);
-//  canvas.setOnMousePressed(this::mouse);
-  canvas.setFocusTraversable(true);
-  gc = canvas.getGraphicsContext2D();
-  vBox.getChildren().add(canvas);
+//  canvas = new Canvas(FRAME_WIDTH, FRAME_HEIGHT);
+//  canvas.setOnKeyPressed(this::key);
+////  canvas.setOnMousePressed(this::mouse);
+//  canvas.setFocusTraversable(true);
+//  gc = canvas.getGraphicsContext2D();
+//  vBox.getChildren().add(canvas);
 
   primaryStage.setOnCloseRequest(e -> {
    e.consume();
    exit_dialog();
   });
+//
+  g_Service = new Game_service(client);
 
-  g_s = new Game_service(client);
+  g_Service.valueProperty().addListener(this::changed);
 
-  g_s.valueProperty().addListener(this::changed);
-
-  g_s.start();
+  g_Service.start();
 
   primaryStage.show();
 
@@ -251,8 +257,6 @@ public class JavaFXApp extends Application implements ChangeListener<P_move>
  private void key(KeyEvent k)
  {
 //  Game_service g_s = new Game_service(client);
-//  g_s.valueProperty().addListener(this::changed);
-//  g_s.start();
 
   //System.out.println(g_s.getState().toString());
 
@@ -262,19 +266,22 @@ public class JavaFXApp extends Application implements ChangeListener<P_move>
   String move = k.getCode().toString();
   switch (move) {
    case "UP":
-    //y += 5;
+    System.out.println(g_Service.t.getClass().getName());
+      g_Service.valueProperty().getValue().y += 5;
+//    g_s.valueProperty().getValue().y += 5;
     break;
    case "DOWN":
-    //y -= 5;
+//    g_s.valueProperty().get().y -= 5;
     break;
    case "LEFT":
-    //x += 5;
+//    g_s.valueProperty().get().x += 5;
     break;
    case "RIGHT":
-    //x -= 5;
+//    g_s.valueProperty().get().x -= 5;
     break;
   }
-
+//  g_s.valueProperty().addListener(this::changed);
+//  g_s.start();
   // wysyla do serwera - client.run()?
   // draw()?
 

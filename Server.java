@@ -30,20 +30,20 @@ public class Server {
         DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length); // do odbierania inny buf i length
 
         datagramSocket.receive(datagramPacket);
-        System.out.println("Packet received");
 
         gameState rec_data = deserialize(datagramPacket.getData());
-        System.out.println("Client player X: " + rec_data.p_c.x + "Y: " + rec_data.p_c.y);
-        System.out.println("Server player X: " + rec_data.p_s.x + "Y: " + rec_data.p_s.y);
+        System.out.println("Received client player  X: " + rec_data.p_c.x + "Y: " + rec_data.p_c.y);
+        System.out.println("Received server player  X: " + rec_data.p_s.x + "Y: " + rec_data.p_s.y);
 
         g_s.p_c = rec_data.p_c;
         send = serialize(g_s);
-        System.out.println("Sent client player X: " + g_s.p_c.x + "Y: " + g_s.p_c.y);
-        System.out.println("Sent server player X: " + g_s.p_s.x + "Y: " + g_s.p_s.y);
 
         DatagramPacket sendpacket = new DatagramPacket(send, send.length,
                datagramPacket.getAddress(), datagramPacket.getPort());
-        System.out.println("Server send");
+
+        System.out.println("Sent client player      X: " + g_s.p_c.x + "Y: " + g_s.p_c.y);
+        System.out.println("Sent server player      X: " + g_s.p_s.x + "Y: " + g_s.p_s.y);
+
         datagramSocket.send(sendpacket);
     }
 

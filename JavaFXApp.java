@@ -51,8 +51,8 @@ class G_task extends Task<P_move> {
         while (true) {
             System.out.println("Task's call method");
 
-            p_move.x = 100 + i;
-            p_move.y = 100 + i;
+//            p_move.x = 100 + i;
+//            p_move.y = 100 + i;
 
             updateValue(null);
             updateValue(p_move);
@@ -61,13 +61,11 @@ class G_task extends Task<P_move> {
 
             i++;
 
-            System.out.println("Local player X: " + p_move.x + "Y: " + p_move.y);
             g_state.p_s = p_move;
 
-            System.out.println("Local client player X: " + g_state.p_c.x + "Y: " + g_state.p_c.y);
-            System.out.println("Local server player X: " + g_state.p_s.x + "Y: " + g_state.p_s.y);
+            System.out.println("Local client player     X: " + g_state.p_c.x + "Y: " + g_state.p_c.y);
+            System.out.println("Local server player     X: " + g_state.p_s.x + "Y: " + g_state.p_s.y);
 
-            System.out.println("run method called");
             server.run(g_state);
 
 //            if (i == 10) {
@@ -176,7 +174,7 @@ public class JavaFXApp extends Application implements ChangeListener<P_move> {
                         P_move oldValue,
                         P_move newValue) {
         if (newValue != null) {
-            System.out.println("changed method called, x = " + newValue.x + "y = " + newValue.y);
+            // System.out.println("changed method called, x = " + newValue.x + "y = " + newValue.y);
 //            try {
 //                Server.run(newValue.x, newValue.y);
 //            } catch (IOException e) {

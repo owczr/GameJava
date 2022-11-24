@@ -28,10 +28,15 @@ public class Server {
         byte send[] = serialize(p);
         DatagramPacket datagramPacket = new DatagramPacket(buf, 43); // do odbierania inny buf i length
         datagramSocket.receive(datagramPacket);
-        System.out.println(Arrays.toString(datagramPacket.getData()));
+        System.out.println("Packet received");
+        // Arrays.toString(
+        P_move rec_data = deserialize(datagramPacket.getData());
+        System.out.println("X: " + rec_data.x + "Y: " + rec_data.y);
+//        DatagramPacket sendpacket = new DatagramPacket(send, send.length,
+//                datagramPacket.getAddress(), datagramPacket.getPort());
+        // datagramSocket
         DatagramPacket sendpacket = new DatagramPacket(send, send.length,
-                datagramPacket.getAddress(), datagramPacket.getPort());
-
+               datagramPacket.getAddress(), datagramPacket.getPort());
         System.out.println("Server send");
         datagramSocket.send(sendpacket);
     }

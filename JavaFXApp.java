@@ -1,4 +1,7 @@
 import javafx.application.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.*;
 import javafx.scene.*;
 import javafx.scene.layout.*;
@@ -107,16 +110,25 @@ class Game_service extends Service<P_move> {
 }
 
 
-public class JavaFXApp extends Application implements ChangeListener<P_move> {
-
+public class JavaFXApp extends Application implements ChangeListener<P_move>
+{
     Stage stage;
 
+    //canvas potrzeby do obslugi przyciskow z klawiatury (1/2)
+    GraphicsContext gc;
+    Canvas canvas;
+
+    private static final int FRAME_WIDTH  = 960;
+    private static final int FRAME_HEIGHT = 600;
+
+
     Server server = new Server(5252);
-    Game_service g_s = new Game_service(server);
+    Game_service g_Service = new Game_service(server);
+
+    //Game_service g_s;
 
     public JavaFXApp() throws SocketException {
     }
-
 
     public static void main(String[] args) {
         launch(args);
@@ -151,20 +163,31 @@ public class JavaFXApp extends Application implements ChangeListener<P_move> {
 
         VBox vBox = new VBox(menuBar);
 
-        Scene scene = new Scene(vBox, 960, 600);
+        Scene scene = new Scene(vBox, FRAME_WIDTH, FRAME_HEIGHT);
 
         primaryStage.setScene(scene);
+
+        //g_s = new Game_service();
+        //System.out.println("GS1:"+g_s.getState().toString());
+
+        //canvas potrzeby do obslugi przyciskow z klawiatury (2/2)
+//  canvas = new Canvas(FRAME_WIDTH, FRAME_HEIGHT);
+//  canvas.setOnKeyPressed(this::key);
+////  canvas.setOnMousePressed(this::mouse);
+//  canvas.setFocusTraversable(true);
+//  gc = canvas.getGraphicsContext2D();
+//  vBox.getChildren().add(canvas);
 
         primaryStage.setOnCloseRequest(e -> {
             e.consume();
             exit_dialog();
         });
+//
+        g_Service = new Game_service(server);
 
-        g_s = new Game_service(server);
+        g_Service.valueProperty().addListener(this::changed);
 
-        g_s.valueProperty().addListener(this::changed);
-
-        g_s.start();
+        g_Service.start();
 
         primaryStage.show();
 
@@ -172,27 +195,27 @@ public class JavaFXApp extends Application implements ChangeListener<P_move> {
 
     public void changed(ObservableValue<? extends P_move> observable,
                         P_move oldValue,
-                        P_move newValue) {
-        if (newValue != null) {
-            // System.out.println("changed method called, x = " + newValue.x + "y = " + newValue.y);
-//            try {
-//                Server.run(newValue.x, newValue.y);
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            } catch (ClassNotFoundException e) {
-//                throw new RuntimeException(e);
-//            }
-        }
-
+                        P_move newValue)
+    {
+        if(newValue != null)
+            System.out.println("changed method called, x = " + newValue.x + "; y = " + newValue.y);
+//  try {
+//   Client.run(newValue.x, newValue.y);
+//  } catch (IOException e) {
+//   e.printStackTrace();
+//  }
 
     }
 
 
-    public void item_1() {
+
+    public void item_1()
+    {
         System.out.println("item 1");
     }
 
-    public void exit_dialog() {
+    public void exit_dialog()
+    {
         System.out.println("exit dialog");
 
 
@@ -206,10 +229,49 @@ public class JavaFXApp extends Application implements ChangeListener<P_move> {
         });
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.YES) {
+        if (result.get() == ButtonType.YES)
+        {
             Platform.exit();
-        } else {
+        }
+        else
+        {
         }
 
     }
+
+    private void key(KeyEvent k)
+    {
+//  Game_service g_s = new Game_service(client);
+
+        //System.out.println(g_s.getState().toString());
+
+        System.out.println("Key= " + k.getCode());
+
+        // TODO: zmienia pozycje swojego kursora (switch)
+        String move = k.getCode().toString();
+        switch (move) {
+            case "UP":
+                // System.out.println(g_Service.t.getClass().getName());
+                g_Service.valueProperty().getValue().y += 5;
+
+                //    g_s.valueProperty().getValue().y += 5;
+                break;
+            case "DOWN":
+//    g_s.valueProperty().get().y -= 5;
+                break;
+            case "LEFT":
+//    g_s.valueProperty().get().x += 5;
+                break;
+            case "RIGHT":
+//    g_s.valueProperty().get().x -= 5;
+                break;
+        }
+//  g_s.valueProperty().addListener(this::changed);
+//  g_s.start();
+        // wysyla do serwera - client.run()?
+        // draw()?
+
+        //System.out.println(g_s.getState().toString());
+    }
+
 }

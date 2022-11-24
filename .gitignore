@@ -25,3 +25,6 @@ replay_pid*
 
 # Visual Studio catalog
 .vs/
+
+# Idea
+.idea/

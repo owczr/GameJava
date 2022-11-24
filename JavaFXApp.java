@@ -6,7 +6,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.SocketException;
 import java.util.*;
@@ -25,17 +24,23 @@ class P_move implements Serializable{
     }
 }
 class gameState implements Serializable {
-    P_move p1;
-    P_move p2;
+    P_move p_c; // client
+    P_move p_s; // server
+    public gameState() {
+        this.p_c = new P_move();
+        this.p_s = new P_move();
+    }
 }
 
 class G_task extends Task<P_move> {
     P_move p_move;
+    gameState g_state;
 
     Server server;
 
     public G_task(Server s) {
         this.p_move = new P_move();
+        this.g_state = new gameState();
         server = s;
     }
 
@@ -46,8 +51,8 @@ class G_task extends Task<P_move> {
         while (true) {
             System.out.println("Task's call method");
 
-            p_move.x = 10 + i;
-            p_move.y = 10 + i;
+            p_move.x = 100 + i;
+            p_move.y = 100 + i;
 
             updateValue(null);
             updateValue(p_move);
@@ -56,15 +61,19 @@ class G_task extends Task<P_move> {
 
             i++;
 
-            System.out.println("x = " + p_move.x + "y = " + p_move.y);
+            System.out.println("Local player X: " + p_move.x + "Y: " + p_move.y);
+            g_state.p_s = p_move;
+
+            System.out.println("Local client player X: " + g_state.p_c.x + "Y: " + g_state.p_c.y);
+            System.out.println("Local server player X: " + g_state.p_s.x + "Y: " + g_state.p_s.y);
 
             System.out.println("run method called");
-            server.run(p_move);
+            server.run(g_state);
 
-            if (i == 10) {
-                updateValue(null);
-                break;
-            }
+//            if (i == 10) {
+//                updateValue(null);
+//                break;
+//            }
 
 
 //            try {
@@ -77,7 +86,7 @@ class G_task extends Task<P_move> {
         }
 
 
-        return p_move;
+       // return p_move;
     }
 }
 

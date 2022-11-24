@@ -21,20 +21,26 @@ public class Server {
         datagramSocket = new DatagramSocket(port);
     }
 
-    public static void run(P_move p) throws IOException, ClassNotFoundException {
+    public void run(gameState g_s) throws IOException, ClassNotFoundException {
         // TODO: Implement receiving and sending game objects
-        byte buf[] = new byte[43];
         // byte send[] = {(byte)x, (byte)y}; // Game()
-        byte send[] = serialize(p);
-        DatagramPacket datagramPacket = new DatagramPacket(buf, 43); // do odbierania inny buf i length
+        byte send[] = serialize(g_s);
+        byte buf[] = new byte[send.length];
+
+        DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length); // do odbierania inny buf i length
+
         datagramSocket.receive(datagramPacket);
         System.out.println("Packet received");
-        // Arrays.toString(
-        P_move rec_data = deserialize(datagramPacket.getData());
-        System.out.println("X: " + rec_data.x + "Y: " + rec_data.y);
-//        DatagramPacket sendpacket = new DatagramPacket(send, send.length,
-//                datagramPacket.getAddress(), datagramPacket.getPort());
-        // datagramSocket
+
+        gameState rec_data = deserialize(datagramPacket.getData());
+        System.out.println("Client player X: " + rec_data.p_c.x + "Y: " + rec_data.p_c.y);
+        System.out.println("Server player X: " + rec_data.p_s.x + "Y: " + rec_data.p_s.y);
+
+        g_s.p_c = rec_data.p_c;
+        send = serialize(g_s);
+        System.out.println("Sent client player X: " + g_s.p_c.x + "Y: " + g_s.p_c.y);
+        System.out.println("Sent server player X: " + g_s.p_s.x + "Y: " + g_s.p_s.y);
+
         DatagramPacket sendpacket = new DatagramPacket(send, send.length,
                datagramPacket.getAddress(), datagramPacket.getPort());
         System.out.println("Server send");
@@ -54,7 +60,7 @@ public class Server {
     }
 
     // used to pack game object
-    public static byte[] serialize(P_move obj) throws IOException {
+    public static byte[] serialize(gameState obj) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream(6400);
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);
@@ -62,9 +68,9 @@ public class Server {
     }
 
     // used to unpack received object
-    public static P_move deserialize(byte[] data) throws IOException, ClassNotFoundException {
+    public static gameState deserialize(byte[] data) throws IOException, ClassNotFoundException {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         ObjectInputStream is = new ObjectInputStream(in);
-        return (P_move)is.readObject();
+        return (gameState) is.readObject();
     }
 }
